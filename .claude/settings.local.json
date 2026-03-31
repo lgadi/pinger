@@ -21,7 +21,8 @@
       "Bash(brew --version)",
       "Bash(softwareupdate:*)",
       "Bash(grep -E \"error:|warning:|Exit|^$\")",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(/Users/gadi/Downloads/pinger/.github/workflows/build.yml:*)"
     ]
   }
 }
