@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(swift build:*)",
+      "Bash(swift --version)",
+      "Bash(swift package:*)",
+      "Bash(xcode-select -p)",
+      "Bash(xcrun swift:*)",
+      "Read(//Library/Developer/CommandLineTools/usr/lib/swift/pm/ManifestAPI/**)",
+      "Bash(otool -l /Library/Developer/CommandLineTools/usr/lib/swift/pm/ManifestAPI/libPackageDescription.dylib)",
+      "Bash(swiftc:*)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(printf '// module.modulemap shadowed — SwiftBridging is in bridging.modulemap\\\\n')",
+      "Bash(chmod +x build.sh)"
+    ]
+  }
+}
