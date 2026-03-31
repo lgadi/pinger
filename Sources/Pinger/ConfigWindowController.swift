@@ -23,6 +23,7 @@ final class ConfigWindowController: NSWindowController {
     private func buildUI() {
         guard let cv = window?.contentView else { return }
 
+        @discardableResult
         func makeLabel(_ s: String, y: CGFloat) -> NSTextField {
             let f = NSTextField(labelWithString: s)
             f.frame = NSRect(x: 20, y: y, width: 170, height: 22)
