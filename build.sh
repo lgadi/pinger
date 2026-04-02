@@ -22,8 +22,10 @@ swiftc \
   -lsqlite3 \
   -o "$MACOS/Pinger"
 
-# Copy Info.plist
+# Copy Info.plist and icon
 cp Resources/Info.plist "$CONTENTS/Info.plist"
+mkdir -p "$CONTENTS/Resources"
+cp Resources/Pinger.icns "$CONTENTS/Resources/Pinger.icns"
 
 # Remove old standalone binary if present
 rm -f "$BUILD_DIR/Pinger"

@@ -18,6 +18,8 @@
     <string>NSApplication</string>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleIconFile</key>
+    <string>Pinger</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>
