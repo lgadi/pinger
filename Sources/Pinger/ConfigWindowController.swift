@@ -50,8 +50,13 @@ final class ConfigWindowController: NSWindowController {
         intervalField = makeField(y: 66)
         intervalField.placeholderString = "1.0"
 
+        let clearBtn = NSButton(title: "Clear History…", target: self, action: #selector(clearHistory))
+        clearBtn.frame = NSRect(x: 20, y: 20, width: 130, height: 32)
+        clearBtn.bezelStyle = .rounded
+        cv.addSubview(clearBtn)
+
         let saveBtn = NSButton(title: "Save & Apply", target: self, action: #selector(save))
-        saveBtn.frame = NSRect(x: 105, y: 20, width: 130, height: 32)
+        saveBtn.frame = NSRect(x: 188, y: 20, width: 130, height: 32)
         saveBtn.bezelStyle = .rounded
         saveBtn.keyEquivalent = "\r"
         cv.addSubview(saveBtn)
@@ -67,6 +72,21 @@ final class ConfigWindowController: NSWindowController {
     }
 
     // MARK: - Actions
+
+    @objc private func clearHistory() {
+        guard let window else { return }
+        let alert = NSAlert()
+        alert.messageText = "Clear ping history?"
+        alert.informativeText = "This will permanently delete all recorded ping data."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Clear")
+        alert.addButton(withTitle: "Cancel")
+        alert.beginSheetModal(for: window) { response in
+            if response == .alertFirstButtonReturn {
+                PingStore.shared.clearAll()
+            }
+        }
+    }
 
     @objc private func save() {
         let host = hostField.stringValue.trimmingCharacters(in: .whitespaces)
