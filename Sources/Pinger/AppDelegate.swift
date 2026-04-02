@@ -9,13 +9,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusMenuItem: NSMenuItem!
     private var configWindowController: ConfigWindowController?
+    private var historyWindowController: HistoryWindowController?
 
     // MARK: - Launch
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Keep app out of the Dock and App Switcher
-        NSApp.setActivationPolicy(.accessory)
-
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         setupMenu()
         setButton("●", color: .secondaryLabelColor)
@@ -37,6 +35,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(statusMenuItem)
 
         menu.addItem(.separator())
+        menu.addItem(NSMenuItem(
+            title: "History…",
+            action: #selector(showHistory),
+            keyEquivalent: "h"
+        ))
         menu.addItem(NSMenuItem(
             title: "Configure…",
             action: #selector(showConfig),
@@ -105,6 +108,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Configuration window
+
+    @objc private func showHistory() {
+        if historyWindowController == nil {
+            historyWindowController = HistoryWindowController()
+        }
+        historyWindowController?.showWindow(nil)
+        historyWindowController?.window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
 
     @objc private func showConfig() {
         if configWindowController == nil {

@@ -77,6 +77,13 @@ final class PingManager {
 
             self?.isPinging = false
             self?.onStatusUpdate?(status)
+            let vpn = VPNMonitor.shared.isVPNActive
+            switch status {
+            case .good(let ms), .degraded(let ms):
+                PingStore.shared.record(latency: ms, vpnActive: vpn)
+            case .unreachable:
+                PingStore.shared.record(latency: nil, vpnActive: vpn)
+            }
         }
 
         do {
@@ -84,6 +91,7 @@ final class PingManager {
         } catch {
             isPinging = false
             onStatusUpdate?(.unreachable)
+            PingStore.shared.record(latency: nil, vpnActive: VPNMonitor.shared.isVPNActive)
         }
     }
 

@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Pinger
-          path: Pinger
+          path: Pinger.app
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -40,10 +40,10 @@ jobs:
           name: Pinger
 
       - name: Make executable
-        run: chmod +x Pinger
+        run: chmod +x Pinger.app/Contents/MacOS/Pinger
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: Pinger
+          files: Pinger.app
           generate_release_notes: true
