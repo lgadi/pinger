@@ -67,6 +67,18 @@ open Pinger.app
 
 The app runs as a menu bar agent — no Dock icon, no console window. To stop it, use **Quit Pinger** from the menu.
 
+### First launch (Gatekeeper)
+
+Because Pinger is not signed with an Apple Developer ID, macOS will block it on first launch. To open it:
+
+1. **Right-click** `Pinger.app` → **Open** → **Open** in the dialog, or
+2. After a blocked launch, go to **System Settings → Privacy & Security** and click **Open Anyway**
+
+Alternatively, remove the quarantine flag from Terminal:
+```sh
+xattr -cr Pinger.app
+```
+
 ## Run at login
 
 Add `Pinger.app` to **System Settings → General → Login Items**.

@@ -27,6 +27,9 @@ cp Resources/Info.plist "$CONTENTS/Info.plist"
 mkdir -p "$CONTENTS/Resources"
 cp Resources/Pinger.icns "$CONTENTS/Resources/Pinger.icns"
 
+# Ad-hoc sign (no Developer ID — allows "Open Anyway" via System Settings)
+codesign --deep --force --sign - "$APP"
+
 # Remove old standalone binary if present
 rm -f "$BUILD_DIR/Pinger"
 
