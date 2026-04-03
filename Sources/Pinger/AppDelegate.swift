@@ -17,10 +17,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var historyWindowController: HistoryWindowController?
 
     private(set) var currentStatus: PingStatus?
+    private var originalDockIcon: NSImage?
 
     // MARK: - Launch
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        originalDockIcon = NSApp.applicationIconImage
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         setupMenu()
         setButton("●", color: .secondaryLabelColor)
@@ -92,6 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func apply(_ status: PingStatus) {
         currentStatus = status
         NotificationCenter.default.post(name: .pingerStatusUpdate, object: nil)
+        updateDockIcon(for: status)
         switch status {
         case .good(let ms):
             stopBlinking()
@@ -111,6 +114,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             statusMenuItem.title = "\(Config.shared.host) — unreachable  ✗"
             startBlinking()
         }
+    }
+
+    // MARK: - Dock icon
+
+    private func updateDockIcon(for status: PingStatus) {
+        guard let base = originalDockIcon else { return }
+        let size = NSSize(width: 128, height: 128)
+        let image = NSImage(size: size, flipped: false) { rect in
+            let bgColor: NSColor
+            switch status {
+            case .good:        bgColor = .systemGreen
+            case .degraded:    bgColor = .systemYellow
+            case .unreachable: bgColor = .systemRed
+            }
+            bgColor.setFill()
+            NSBezierPath(roundedRect: rect, xRadius: 26, yRadius: 26).fill()
+            base.draw(in: rect.insetBy(dx: 14, dy: 14))
+            return true
+        }
+        NSApp.applicationIconImage = image
     }
 
     // MARK: - Icon helpers
@@ -200,6 +223,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !stillOpen {
             NotificationCenter.default.removeObserver(self, name: NSWindow.willCloseNotification, object: nil)
             NSApp.setActivationPolicy(.accessory)
+            NSApp.applicationIconImage = originalDockIcon
         }
     }
 }
