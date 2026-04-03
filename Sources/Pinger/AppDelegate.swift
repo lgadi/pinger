@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var blinkPhase = false
 
     private var statusMenuItem: NSMenuItem!
+    private var aboutWindowController: AboutWindowController?
     private var configWindowController: ConfigWindowController?
     private var historyWindowController: HistoryWindowController?
 
@@ -63,6 +64,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ))
 
         statusItem.menu = menu
+        setupMainMenu()
+    }
+
+    private func setupMainMenu() {
+        let mainMenu = NSMenu()
+
+        // App menu (first item title is ignored by macOS — it always shows the app name)
+        let appMenu = NSMenu()
+        appMenu.addItem(NSMenuItem(title: "About Pinger",        action: #selector(showAbout),       keyEquivalent: ""))
+        appMenu.addItem(NSMenuItem(title: "Check for Updates…",  action: #selector(checkForUpdates), keyEquivalent: ""))
+        appMenu.addItem(.separator())
+        appMenu.addItem(NSMenuItem(title: "History…",            action: #selector(showHistory),     keyEquivalent: "h"))
+        appMenu.addItem(NSMenuItem(title: "Configure…",          action: #selector(showConfig),      keyEquivalent: ","))
+        appMenu.addItem(.separator())
+        appMenu.addItem(NSMenuItem(title: "Quit Pinger",         action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+
+        let appMenuItem = NSMenuItem()
+        appMenuItem.submenu = appMenu
+        mainMenu.addItem(appMenuItem)
+
+        NSApp.mainMenu = mainMenu
     }
 
     // MARK: - Status updates
@@ -128,13 +150,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Configuration window
 
+    @objc private func showAbout() {
+        if aboutWindowController == nil {
+            aboutWindowController = AboutWindowController()
+        }
+        aboutWindowController?.showWindow(nil)
+        aboutWindowController?.window?.makeKeyAndOrderFront(nil)
+        becomeRegularApp()
+    }
+
+    @objc private func checkForUpdates() {
+        UpdateChecker.checkExplicitly()
+    }
+
     @objc private func showHistory() {
         if historyWindowController == nil {
             historyWindowController = HistoryWindowController()
         }
         historyWindowController?.showWindow(nil)
         historyWindowController?.window?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        becomeRegularApp()
     }
 
     @objc private func showConfig() {
@@ -144,6 +179,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configWindowController?.refresh()
         configWindowController?.showWindow(nil)
         configWindowController?.window?.makeKeyAndOrderFront(nil)
+        becomeRegularApp()
+    }
+
+    // MARK: - Activation policy
+
+    private func becomeRegularApp() {
+        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowClosed),
+            name: NSWindow.willCloseNotification,
+            object: nil
+        )
+    }
+
+    @objc private func windowClosed() {
+        let stillOpen = NSApp.windows.contains { $0.isVisible && $0 !== statusItem.button?.window }
+        if !stillOpen {
+            NotificationCenter.default.removeObserver(self, name: NSWindow.willCloseNotification, object: nil)
+            NSApp.setActivationPolicy(.accessory)
+        }
     }
 }
