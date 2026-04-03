@@ -29,6 +29,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async { self?.apply(status) }
         }
         pingManager.start()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            UpdateChecker.checkInBackground()
+        }
     }
 
     // MARK: - Menu

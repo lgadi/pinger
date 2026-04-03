@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches: [main]
-    tags: ["v*"]
+    tags: ["20*"]
   pull_request:
     branches: [main]
 
@@ -19,6 +19,8 @@ jobs:
 
       - name: Build
         run: ./build.sh
+        env:
+          VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
 
       - name: Zip app bundle
         run: zip -r --symlinks Pinger.app.zip Pinger.app
@@ -30,7 +32,7 @@ jobs:
           path: Pinger.app.zip
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/20')
     needs: build
     runs-on: macos-latest
     permissions:
@@ -40,6 +42,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Create DMG
+        env:
+          VERSION: ${{ github.ref_name }}
         run: ./package.sh
 
       - name: Create GitHub release
