@@ -1,5 +1,9 @@
 import AppKit
 
+extension Notification.Name {
+    static let pingerStatusUpdate = Notification.Name("com.pinger.statusUpdate")
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     var pingManager: PingManager!
@@ -10,6 +14,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusMenuItem: NSMenuItem!
     private var configWindowController: ConfigWindowController?
     private var historyWindowController: HistoryWindowController?
+
+    private(set) var currentStatus: PingStatus?
 
     // MARK: - Launch
 
@@ -58,6 +64,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Status updates
 
     private func apply(_ status: PingStatus) {
+        currentStatus = status
+        NotificationCenter.default.post(name: .pingerStatusUpdate, object: nil)
         switch status {
         case .good(let ms):
             stopBlinking()
@@ -105,6 +113,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func stopBlinking() {
         blinkTimer?.invalidate()
         blinkTimer = nil
+    }
+
+    // MARK: - Reopen (re-launch while already running)
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        showHistory()
+        return true
     }
 
     // MARK: - Configuration window
